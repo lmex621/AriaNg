@@ -43,7 +43,7 @@
             aria2SettingService.addSettingHistory('dir', options.dir);
         };
 
-        var downloadByLinks = function (pauseOnAdded, responseCallback) {
+        var getDownloadTasksByLinks = function () {
             var urls = ariaNgCommonService.parseUrlsFromOriginInput($scope.context.urls);
             var options = angular.copy($scope.context.options);
             var tasks = [];
@@ -58,6 +58,12 @@
                     options: options
                 });
             }
+
+            return tasks;
+        };
+
+        var downloadByLinks = function (pauseOnAdded, responseCallback) {
+            var tasks = getDownloadTasksByLinks();
 
             saveDownloadPath(options);
 
@@ -106,7 +112,8 @@
                 global: true,
                 http: false,
                 bittorrent: false
-            }
+            },
+            exportCommandApiOptions: null
         };
 
         if (parameters.url) {
@@ -229,6 +236,13 @@
             } else if ($scope.context.taskType === 'metalink') {
                 $rootScope.loadPromise = downloadByMetalink(pauseOnAdded, responseCallback);
             }
+        };
+
+        $scope.showExportCommandAPIModal = function () {
+            $scope.context.exportCommandApiOptions = {
+                type: 'new-task',
+                data: getDownloadTasksByLinks()
+            };
         };
 
         $scope.setOption = function (key, value, optionStatus) {
